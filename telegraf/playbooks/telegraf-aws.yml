@@ -1,0 +1,8 @@
+---
+- name: Deploys Telegraf on AWS with Cloudwatch Output
+  hosts: all
+  become: yes
+  become_user: root
+  roles:
+    - repository-setup
+    - telegraf-aws
