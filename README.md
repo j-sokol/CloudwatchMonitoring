@@ -1,5 +1,30 @@
 # Cloudwatch Monitoring
-Set of lambda functions creating metrics and alarms in Cloudwatch, with output to Slack
+Lightweight monitoring solution to notify yourself of statuses of your servers & applications. Currently supports only Slack as an output, but that's easily extensible.
+
+
+## How it works
+
+```
++--------------------+                +-------------------+
+|Server Metrics      +--------+       |Alarms Definition  |
+|(via Telegraf)      |        |       |(Alarms lambda fn) |
++--------------------+        |       +-----------------+-+
+                              v                         |
++--------------------+    +-------------------------+   |    +-----------   +-----------------+
+|Application Uptime  |    |          CloudWatch     | <-+    |Amazon SNS|   |Slack message    |
+|Metrics (Uptime     +--->|                         |        |Topic     +-->|(via Slack notify|
+|Lambda fn)          |    |Timeseries DB  ->  Alarms|------->|          |   |Lambda fn)       |
++--------------------+    +-------------------------+        +-----------   +-----------------+
+                              ^
++--------------------+        |
+|Application Metrics |        |
+|(API Monitoring     |        |
+|Lambda fn)          +--------+
++--------------------+
+```
+## How to deploy
+
+## Running tests
 
 
 ## Zadání semestrálky
