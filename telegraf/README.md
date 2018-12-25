@@ -3,6 +3,8 @@
 
 Deploys a telegraf agent on AWS instances with minimal config, exporting metrics to CloudWatch.
 
+## How to deploy
+
 
 ## Available options
 
