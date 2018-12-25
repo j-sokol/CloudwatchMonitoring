@@ -1,4 +1,4 @@
-# Telegraf Role for AWS deployment
+# Telegraf Role for EC2 instances (currently RHEL6/7 supported)
 
 
 Deploys a telegraf agent on AWS instances with minimal config, exporting metrics to CloudWatch.
