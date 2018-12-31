@@ -1,0 +1,106 @@
+---
+- alert_metric: disk_used_percent
+  namespace: "Monitoring/Telegraf"
+  stat: Average
+  period: 60
+  eval_period: 5
+  operator: GreaterThanThreshold
+  threshold: 85.0
+  dimensions: 
+    - type: ec2_instances
+      name: host
+      dns_search: "elasticsearch-data"
+      has_tags:
+        - Key: Application
+          Value: energy-monitoring
+    - type: static
+      name: device
+      value:
+        - mapper/vg_elasticsearch_data-lv_elasticsearch_data
+
+- alert_metric: disk_used_percent
+  namespace: "Monitoring/Telegraf"
+  stat: Average
+  period: 60
+  eval_period: 5
+  operator: GreaterThanThreshold
+  threshold: 85.0
+  dimensions: 
+    - type: ec2_instances
+      name: host
+      dns_search: "influxdb-data"
+      has_tags:
+        - Key: Application
+          Value: energy-monitoring
+    - type: static
+      name: device
+      value:
+        - mapper/vg_influxdb_meta_data-lv_influxdb_meta_data
+
+- alert_metric: disk_used_percent
+  namespace: "Monitoring/Telegraf"
+  stat: Average
+  period: 60
+  eval_period: 5
+  operator: GreaterThanThreshold
+  threshold: 85.0
+  dimensions: 
+    - type: ec2_instances
+      name: host
+      dns_search: "influxdb-data"
+      has_tags:
+        - Key: Application
+          Value: energy-monitoring
+    - type: static
+      name: device
+      value:
+        - mapper/vg_influxdb_data-lv_influxdb_data
+
+- alert_metric: uptime
+  namespace: "EnergyMonitoring/Uptime" 
+  stat: Average
+  period: 60
+  eval_period: 5
+  operator: LessThanThreshold
+  threshold: 1.0
+  dimensions: 
+    - type: static
+      name: url
+      value:
+        - https://kibana.energy.svc.dbgcloud.io
+        - https://kapacitor.energy.svc.dbgcloud.io/
+        - https://influxdb.energy.svc.dbgcloud.io/ping
+        - https://elasticsearch.energy.svc.dbgcloud.io/
+        - https://alerta.energy.svc.dbgcloud.io/
+        - https://grafana.energy.svc.dbgcloud.io/
+        - https://chrongraf.energy.svc.dbgcloud.io/health
+
+- alert_metric: mem_used_percent
+  namespace: "Monitoring/Telegraf" 
+  stat: Average
+  period: 60
+  eval_period: 5
+  operator: GreaterThanThreshold
+  threshold: 90.0
+  dimensions: 
+    - type: ec2_instances
+      name: host
+      dns_search: ""
+      has_tags:
+        - Key: Application
+          Value: energy-monitoring
+
+# - alert_metric: cpu_usage_system
+#   namespace: "Monitoring/Telegraf" 
+#   stat: Average
+#   period: 60
+#   eval_period: 5
+#   operator: MoreThanThreshold
+#   threshold: 90.0
+#   dimensions: 
+#     - type: ec2_instances
+#       name: instance
+#       dns_search: "*"
+#       has_tags:
+#         - Key: Application
+#           Value: energy-monitoring
