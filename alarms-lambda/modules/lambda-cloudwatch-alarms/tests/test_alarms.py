@@ -14,6 +14,10 @@ def test_match_fn():
     assert dns_matches(domain, regexp) == True
 
 
+
+@mock_cloudwatch
+@mock_ec2
+@mock_route53
 def test_create_alerter():
     """Test match fn"""
 
