@@ -46,8 +46,12 @@ def test_get_ec2_instances_with_dns():
     print(ec2.values())
 
     assert len(ec2) >= 1
-    assert False == True
+    # assert False == True
 
+# Add mocked dns
+# Add mocked alerts
+# Check if alerts added
+# Check if alerts removed
 
 
 
