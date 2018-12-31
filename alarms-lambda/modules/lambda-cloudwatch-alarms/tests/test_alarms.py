@@ -23,7 +23,9 @@ def test_get_ec2_instances():
     alerter  = Alerter()
 
     create_ec2_with_tags(alerter.ec2_client)
-    ec2 = alerter.get_ec2_instances()
+    ip = '192.168.42.5'
+
+    ec2 = alerter.get_ec2_instances(ip)
 
     print(len(ec2.values()))
 
