@@ -20,12 +20,13 @@ def test_get_ec2_instances():
     """Test match fn"""
 
     os.environ["CONFIG_FILE"] = "alarms/config.yaml"
-    alerter  = Alerter()
-
-    create_ec2_with_tags(alerter.ec2_client)
     ip = '192.168.42.5'
 
-    ec2 = alerter.get_ec2_instances(ip)
+    alerter  = Alerter()
+
+    create_ec2_with_tags(alerter.ec2_client, ip)
+
+    ec2 = alerter.get_ec2_instances()
 
     print(len(ec2.values()))
 
@@ -42,8 +43,8 @@ def test_get_ec2_instances_with_dns():
     ip = '192.168.42.5'
     alerter  = Alerter()
 
-    create_ec2_with_tags(alerter.ec2_client)
-    ec2 = alerter.get_ec2_instances(ip)
+    create_ec2_with_tags(alerter.ec2_client, ip)
+    ec2 = alerter.get_ec2_instances()
 
     print(ec2.values())
 
