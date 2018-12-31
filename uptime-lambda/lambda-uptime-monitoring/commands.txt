@@ -1,0 +1,36 @@
+####################################################
+#
+#   Example for dbg-product-sz environment   
+#
+####################################################
+
+# Initialize TF with s3 backend bucket for tfstate
+terraform init -backend-config=dbg-product-sz/backends.tfvars
+ 
+# Validate TF code with variables specific for environment
+terraform validate -var-file=dbg-product-sz/vars.tfvars
+ 
+# Plan TF with variables specific for environment
+terraform plan -var-file=dbg-product-sz/vars.tfvars
+ 
+# Apply TF with variables specific for environment
+terraform apply -var-file=dbg-product-sz/vars.tfvars
+ 
+# Destroy TF with variables specific for environment
+terraform destroy -var-file=dbg-product-sz/vars.tfvars
+
+############################################################
+#
+#   Example for dbg-product-sz environment using Makefile  
+#
+############################################################
+
+make init env=dbg-product-sz
+
+make validate env=dbg-product-sz
+
+make plan env=dbg-product-sz
+
+make apply env=dbg-product-sz
+
+make destroy env=dbg-product-sz
