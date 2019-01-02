@@ -1,4 +1,6 @@
 # Cloudwatch Monitoring
+[![Build Status](https://travis-ci.com/j-sokol/CloudwatchMonitoring.svg?branch=master)](https://travis-ci.com/j-sokol/CloudwatchMonitoring)
+
 Lightweight monitoring solution to notify yourself of statuses of your servers & applications. Currently supports only Slack as an output, but that's easily extensible.
 
 
@@ -15,12 +17,6 @@ Lightweight monitoring solution to notify yourself of statuses of your servers &
 |Metrics (Uptime     +--->|                         |        |Topic     +-->|(via Slack notify|
 |Lambda fn)          |    |Timeseries DB  ->  Alarms|------->|          |   |Lambda fn)       |
 +--------------------+    +-------------------------+        +-----------   +-----------------+
-                              ^
-+--------------------+        |
-|Application Metrics |        |
-|(API Monitoring     |        |
-|Lambda fn)          +--------+
-+--------------------+
 ```
 ## How to deploy
 
