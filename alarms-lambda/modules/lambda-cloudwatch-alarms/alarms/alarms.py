@@ -189,49 +189,6 @@ class Alerter(object):
 
         return self.groups
 
-    # def get_matching_security_group(self, matching_group):
-    #     # Get security group matching `aws_security_group`
-    #     for k, attrs in self.groups.items():        
-    #         if attrs['GroupName'] == matching_group:
-    #             security_group_id = k
-    #             logger.info("Matching group is: {0}, name: {1}".format(k, attrs['GroupName']))
-    #     return security_group_id
-
-    # def get_security_group_members(self, security_group_id):
-    #     # Get members of `aws_security_group` security group (aka all the cluster nodes)
-    #     security_group_members = []
-    #     for sg_id, members in self.membership.items():
-    #         if sg_id == security_group_id:
-    #             security_group_members = members
-    #             logger.info("Matching group is: {0}".format(sg_id))
-
-    #     return security_group_members
-
-
-    # def get_es_nodes(self, matching_group):
-    #     security_group_id = self.get_matching_security_group(matching_group)
-
-    #     security_group_members = self.get_security_group_members(security_group_id)
-    #     es_nodes = []
-    #     for k, attrs in self.all_ec2.items():
-    #         if ('ec2', attrs['InstanceId']) in security_group_members:
-    #             # Parse node type from it's tags
-    #             for tag in attrs['Tags']:
-    #                 if tag['Key'] == 'Name':
-    #                     node_name = tag['Value']
-    #             node_type = node_name.split('-')[-2]
-
-    #             # Create all specific names
-    #             node_tag_name = "es-" +  node_type + "-" + attrs['Placement']['AvailabilityZone'] + "-" + attrs['InstanceId']
-    #             node_short_name = node_type + "-" + attrs['InstanceId']
-    #             es_nodes.append({"node_tag_name": node_tag_name, "ip_address": attrs['PrivateIpAddress'], 
-    #                             "node_short_name": node_short_name})
-
-    #             logger.info("Node tag name: {0}".format(node_tag_name))
-    #             logger.info("Node type: {0}".format(node_type))
-
-    #     return es_nodes
-
 
     def resolve_ips(self, instance_list):
         zones = self.route53_client.list_hosted_zones()
@@ -241,12 +198,13 @@ class Alerter(object):
             record_sets = r['ResourceRecordSets']
 
             # Paginate over all results
-            while r['IsTruncated'] == True:
-                r = self.route53_client.list_resource_record_sets(
-                    HostedZoneId=z['Id'],
-                    StartRecordName=r['NextRecordName']
-                )
-                record_sets += r['ResourceRecordSets']
+            if 'IsTruncated' in r:
+                while r['IsTruncated'] == True:
+                    r = self.route53_client.list_resource_record_sets(
+                        HostedZoneId=z['Id'],
+                        StartRecordName=r['NextRecordName']
+                    )
+                    record_sets += r['ResourceRecordSets']
 
             logger.info("Found the following records: {0}".format(record_sets))
             for r_set in record_sets:
@@ -271,9 +229,9 @@ class Alerter(object):
 
         return matching_instances
 
-    def build_alarms(self, config):
+    def build_alarms(self):
         alarms = []
-        for alarm in config:
+        for alarm in self.config:
             alarm_dimensions = {}
             for dimension in alarm['dimensions']:
                 dimension_name = dimension['name']
@@ -348,10 +306,13 @@ class Alerter(object):
 
 
     def delete_alarms(self, alarms):
+        deleted = []
         # Delete alarms that were not in the new generated set
         for alarm_name in alarms:
             self.cloudwatch_client.delete_alarms(AlarmNames=[alarm_name])
             logger.info("Deleted alarm: {0}".format(alarm_name))
+            deleted.append(alarm_name)
+        return deleted
 
 
 def create_alarms():
@@ -362,15 +323,8 @@ def create_alarms():
     # Get all ec2s in all regions
     all_ec2 = alerter.get_ec2_instances()
     
-    # # Get all es nodes
-    # es_security_group = os.getenv('AWS_SECURITY_GROUP', 'sec-energy-elasticsearch-instances')
-    # es_nodes = alerter.get_es_nodes(es_security_group)
-    # logger.info("ES nodes are:")
-    # logger.info(es_nodes)
-    # print(es_nodes)
 
-
-    alarms = alerter.build_alarms(alerter.config)
+    alarms = alerter.build_alarms()
     new_cw_alarms = alerter.deploy_alarms()
 
     # Difference of alarms already in CW in and newly created ones 

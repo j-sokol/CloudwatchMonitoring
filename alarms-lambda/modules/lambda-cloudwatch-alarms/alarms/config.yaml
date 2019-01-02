@@ -57,7 +57,7 @@
         - mapper/vg_influxdb_data-lv_influxdb_data
 
 - alert_metric: uptime
-  namespace: "EnergyMonitoring/Uptime" 
+  namespace: "Monitoring/Uptime" 
   stat: Average
   period: 60
   eval_period: 5
@@ -67,13 +67,7 @@
     - type: static
       name: url
       value:
-        - https://kibana.energy.svc.dbgcloud.io
-        - https://kapacitor.energy.svc.dbgcloud.io/
-        - https://influxdb.energy.svc.dbgcloud.io/ping
-        - https://elasticsearch.energy.svc.dbgcloud.io/
-        - https://alerta.energy.svc.dbgcloud.io/
-        - https://grafana.energy.svc.dbgcloud.io/
-        - https://chrongraf.energy.svc.dbgcloud.io/health
+        - https://stallman.org/
 
 - alert_metric: mem_used_percent
   namespace: "Monitoring/Telegraf" 
