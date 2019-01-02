@@ -1,6 +1,11 @@
 language: python
 python:
   - '3.6'
+
+before_install:
+  - export BOTO_CONFIG=/dev/null
+  - export AWS_SECRET_ACCESS_KEY=foobar_secret 
+  - export AWS_ACCESS_KEY_ID=foobar_key 
 install:
   - pip install -r tests/requirements.txt
 script:
