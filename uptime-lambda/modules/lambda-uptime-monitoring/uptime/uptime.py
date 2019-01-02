@@ -21,7 +21,7 @@ class CloudWatchMetricsList(collections.UserList):
 
 ACCEPTABLE_RESPONSE_CODES = [ 200, 204, 301, 302, 401, 404 ]
 aws_region = os.getenv('AWS_REGION', 'eu-central-1')
-URLS_TO_MONITOR = os.getenv('URLS_TO_MONITOR', 'https://kibana.energy.svc.dbgcloud.io | https://grafana.energy.svc.dbgcloud.io')
+URLS_TO_MONITOR = os.getenv('URLS_TO_MONITOR', 'https://gitlab.com | https://stallman.org')
 TIMEOUT = int(os.getenv('TIMEOUT', 30)) # Enforce str to int conversion
 CLOUDWATCH_NAMESPACE = os.getenv('CLOUDWATCH_NAMESPACE', 'EnergyMonitoring/Uptime')
 PROXY = os.getenv('PROXY', False)
@@ -51,8 +51,8 @@ async def check_url(url, raise_error=False, loop=None):
 
     :param url: URL
     Usage::
-    >>> is_it_up = check_domain('http://deutsche-boerse.com')
-    [{'url': 'http://deutsche-boerse.com', 'status_code': 200}]
+    >>> is_it_up = check_domain('http://duckduckgo.com')
+    [{'url': 'http://duckduckgo.com', 'status_code': 200}]
     """
     logger.info("Checking: {0}".format(url))
     timeout = aiohttp.ClientTimeout(total=TIMEOUT)
@@ -77,7 +77,7 @@ def check_urls(urls=None):
 
     :param domain_list: a list of urls
     Usage::
-      >>> hosts_list = check_urls(urls=['http://deutsche-boerse.com'])
+      >>> hosts_list = check_urls(urls=['http://duckduckgo.com'])
     """
 
     loop = asyncio.get_event_loop()
@@ -132,16 +132,11 @@ def collect_metrics(urls=None):
 def lambda_handler(event, handler):
     CloudWatchMetrics = collect_metrics(urls=URLS_TO_MONITOR)
 
-    collect_metrics(urls=URLS_TO_MONITOR)
     cloudwatch_client.put_metric_data(
         Namespace=CLOUDWATCH_NAMESPACE,
         MetricData=CloudWatchMetrics.data
     )
 
-# lambda_handler('','')
-
-
-# print(CloudWatchMetrics)
 if __name__ == '__main__':
     metrics = collect_metrics(urls=URLS_TO_MONITOR)
     print(metrics)

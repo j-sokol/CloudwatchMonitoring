@@ -6,7 +6,7 @@
 #################################
 resource "null_resource" "uptime_monitoring_lambda_dependecies" {
   provisioner "local-exec" {
-    command = "${path.module}/source/install_dependecies.sh"
+    command = "${path.module}/uptime/install_dependecies.sh"
     interpreter = ["/bin/bash"]
   }
 }
@@ -18,8 +18,8 @@ resource "null_resource" "uptime_monitoring_lambda_dependecies" {
 #################################
 data "archive_file" "uptime_monitoring_lambda_function" {
   type        = "zip"
-  source_dir = "${path.module}/source/deployment"
-  output_path = "${path.module}/source/deployment/uptime-monitoring.zip"
+  source_dir = "${path.module}/uptime/deployment"
+  output_path = "${path.module}/uptime/deployment/uptime-monitoring.zip"
 
   depends_on = ["null_resource.uptime_monitoring_lambda_dependecies"]
 }

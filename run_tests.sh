@@ -1,11 +1,16 @@
 #!/bin/bash
 set -e
 
-# # https://github.com/travis-ci/travis-ci/issues/7940
-# export BOTO_CONFIG=/dev/null
-
+# Run Alarm tests
 pwd=$PWD
 cd alarms-lambda/modules/lambda-cloudwatch-alarms
 python -m pytest tests/test_alarms.py
+
+
+# Run Uptime monitoring tests
+cd $pwd
+cd uptime-lambda/modules/lambda-uptime-monitoring
+python -m pytest tests/test_uptime.py
+
 
 cd $pwd

@@ -2,5 +2,6 @@
 requests
 PyYAML
 boto3
-moto
+moto 
 pytest
+aiohttp
