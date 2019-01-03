@@ -21,8 +21,22 @@ Lightweight monitoring solution to notify yourself of statuses of your servers &
 ## How to deploy
 
 ## Running tests
-
-
+Before running tests it's recommended to create an python virtual environment. For that you need to have Python v3.6+ installed. Then run:
+```
+python3 -m venv __venv__
+```
+and activate it:
+```
+. ./__venv__/bin/activate
+```
+All the libraries needed for tests should be installed now. You can do it via pip:
+```
+pip install -r tests/requirements.txt
+```
+And finally run the tests:
+```
+bash run_tests.sh
+```
 ## Zadání semestrálky
 
 Vytvoření vlastního monitoringu, který bude high-available a spolehlivý, může dát velmi práce. Proto bych si rád vybral téma této semestrálky - jednoduchý monitoring postavený na AWS službách - CloudWatch pro time series databázi a alerty při překročení tresholdů, SNS na posílání zpráv mezi mikroslužbami a konečně Lambda pro serverless spouštění jednotlivých služeb.
