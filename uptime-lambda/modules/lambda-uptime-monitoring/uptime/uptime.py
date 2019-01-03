@@ -23,21 +23,13 @@ ACCEPTABLE_RESPONSE_CODES = [ 200, 204, 301, 302, 401, 404 ]
 aws_region = os.getenv('AWS_REGION', 'eu-central-1')
 URLS_TO_MONITOR = os.getenv('URLS_TO_MONITOR', 'https://gitlab.com | https://stallman.org')
 TIMEOUT = int(os.getenv('TIMEOUT', 30)) # Enforce str to int conversion
-CLOUDWATCH_NAMESPACE = os.getenv('CLOUDWATCH_NAMESPACE', 'EnergyMonitoring/Uptime')
+CLOUDWATCH_NAMESPACE = os.getenv('CLOUDWATCH_NAMESPACE', 'Monitoring/Uptime')
 PROXY = os.getenv('PROXY', False)
-
-session = boto3.Session(region_name=aws_region) 
-if PROXY: 
-    cloudwatch_client = session.client('cloudwatch', 
-        config=Config(proxies={'https': PROXY})
-    )
-else: 
-    cloudwatch_client = session.client('cloudwatch')
 
 
 def parse_env_urls(urls=None):    
     """Parses a list of urls
-    >>> parse_urls(urls='https://kibana.energy.svc.dbg.com | https://grafana.energy.svc.dbg.com')
+    >>> parse_env_urls(urls='https://kibana.energy.svc.dbg.com | https://grafana.energy.svc.dbg.com')
     ['https://kibana.energy.svc.dbg.com', 'https://grafana.energy.svc.dbg.com']
     """
 
@@ -51,7 +43,7 @@ async def check_url(url, raise_error=False, loop=None):
 
     :param url: URL
     Usage::
-    >>> is_it_up = check_domain('http://duckduckgo.com')
+    >>> is_it_up = check_url('http://duckduckgo.com')
     [{'url': 'http://duckduckgo.com', 'status_code': 200}]
     """
     logger.info("Checking: {0}".format(url))
@@ -80,19 +72,27 @@ def check_urls(urls=None):
       >>> hosts_list = check_urls(urls=['http://duckduckgo.com'])
     """
 
-    loop = asyncio.get_event_loop()
     logger.info("Checking {0} domains".format(len(urls)))
 
     requests = []
     for url in urls:
         requests.append(asyncio.ensure_future(check_url(url)))
 
-    results = loop.run_until_complete(asyncio.gather(*requests))
+    return requests
 
+
+def gather_requests(urls=None):
+
+    loop = asyncio.get_event_loop()
+
+    requests = check_urls(urls)
+
+    results = loop.run_until_complete(asyncio.gather(*requests))
     logger.info("Collected {0} metrics".format(len(results)))
 
-
     return results
+
+
 
 def create_cloudwatch_metric(url, report_time, value):
     cw_metric = {
@@ -113,9 +113,7 @@ def create_cloudwatch_metric(url, report_time, value):
 def collect_metrics(urls=None):
     metrics = CloudWatchMetricsList()
     urls_list = parse_env_urls(urls=urls)
-    print(urls_list)
-    results = check_urls(urls=urls_list)
-    print(results)
+    results = gather_requests(urls=urls_list)
     
     report_time = datetime.datetime.utcnow()
 
@@ -128,14 +126,28 @@ def collect_metrics(urls=None):
 
     return metrics
 
+def send_metrics(cloudwatch_metrics, session=None):
+
+    if session == None:
+        session = boto3.Session(region_name=aws_region) 
+    if PROXY: 
+        cloudwatch_client = session.client('cloudwatch', 
+            config=Config(proxies={'https': PROXY})
+        )
+    else: 
+        cloudwatch_client = session.client('cloudwatch')
+
+
+    cloudwatch_client.put_metric_data(
+        Namespace=CLOUDWATCH_NAMESPACE,
+        MetricData=cloudwatch_metrics
+    )
+
 
 def lambda_handler(event, handler):
     CloudWatchMetrics = collect_metrics(urls=URLS_TO_MONITOR)
 
-    cloudwatch_client.put_metric_data(
-        Namespace=CLOUDWATCH_NAMESPACE,
-        MetricData=CloudWatchMetrics.data
-    )
+    send_metrics(CloudWatchMetrics)
 
 if __name__ == '__main__':
     metrics = collect_metrics(urls=URLS_TO_MONITOR)

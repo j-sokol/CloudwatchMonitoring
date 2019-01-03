@@ -1,49 +1,56 @@
 from uptime.uptime import *
 from moto import *
-# from helpers import *
+import aresponses
+import pytest
+import datetime
 
-
-
-def test_fetch_metrics():
+def test_parse_urls():
     URLS_TO_MONITOR = "https://gitlab.com | https://stallman.org"
-    metrics = collect_metrics(urls=URLS_TO_MONITOR)
+    # metrics = collect_metrics(urls=URLS_TO_MONITOR)
+
+    urls =  parse_env_urls(urls=URLS_TO_MONITOR)
+
+    print(urls)
+
+    assert "https://gitlab.com" in urls
+    assert "https://stallman.org" in urls
+
+
+@pytest.mark.asyncio
+async def test_async_request(event_loop):
+    async with aresponses.ResponsesMockServer(loop=event_loop) as arsps:
+        arsps.add(arsps.ANY, '/', 'get', arsps.Response(status=200, text='Running ok.'))
+
+        is_it_up = check_url('http://duckduckgo.com')
+        response = await is_it_up
+
+        assert response['status_code'] == 200
+
+
+def test_create_metric():
+    url = "https://foobar.baz"
+    report_time = datetime.datetime.utcnow()
+    value = 1
+    metric = create_cloudwatch_metric(url, report_time, value)
+    print(metric)
+    assert metric['MetricName'] == 'uptime'
+    assert metric['Value'] == 1
+
+
+
+@mock_cloudwatch
+def test_sending_metrics():
+    url = "https://foobar.baz"
+    report_time = datetime.datetime.utcnow()
+    value = 1
+    metric = create_cloudwatch_metric(url, report_time, value)
+    session = boto3.Session(region_name='eu-central-1') 
+    send_metrics([metric], session=session)
+
+
+    cloudwatch_client = session.client('cloudwatch')
+    metrics = cloudwatch_client.list_metrics()['Metrics']
     print(metrics)
 
-
-    assert True == True
-
-
-# @mock_ec2
-# @mock_route53
-# @mock_cloudwatch
-# def test_adding_alarms():
-
-#     pass
-#     # Define vars
-#     os.environ["CONFIG_FILE"] = "alarms/config.yaml"
-#     ip = '192.168.42.5'
-#     fqdn = "foobar.baz"
-#     domain = "alerta"
-#     alert_prefix = "alert"
-
-#     # Create Alerter object
-#     alerter  = Alerter()
-
-
-#     # Create mocked resources
-#     create_alarms(alerter.cloudwatch_client, prefix=alert_prefix)
-#     create_ec2_with_tags(alerter.ec2_client, ip)
-#     create_dns_record(alerter.session, ip, domain, fqdn)
-
-
-#     # Run scenario
-#     old_cw_alarms = alerter.get_already_created_alarms()
-#     alerter.get_ec2_instances()
-#     alerter.build_alarms()
-#     new_cw_alarms = alerter.deploy_alarms()
-#     leftover_alarms = set(old_cw_alarms).difference(set(new_cw_alarms))
-#     deleted = alerter.delete_alarms(leftover_alarms)        
-
-#     assert 'alert-testalarm1' in deleted
-#     assert 'alert-testalarm2' in deleted
+    assert metrics[0]['MetricName'] == 'uptime'
 
