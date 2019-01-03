@@ -18,7 +18,7 @@ You will need to create your own static inventory, which is described *[here](ht
 And then run the the playbook.
 ```
 ansible-playbook playbooks/telegraf-aws.yml -i *your inventory script*  --limit '*regexp to limit your search to only selected instances*'
-``
+```
 
 ## Available options
 
