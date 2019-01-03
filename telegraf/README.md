@@ -5,6 +5,20 @@ Deploys a telegraf agent on AWS instances with minimal config, exporting metrics
 
 ## How to deploy
 
+Deployment is handled via tool ansible. Ansible can be installed from pip and it's recommended to have version >= 2.7.
+Steps may be as follows:
+```
+python3 -m venv __venv__
+. ./__venv__/bin/activate
+pip install ansible boto3
+```
+You will need to create your own static inventory, which is described *[here](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)*, or you can use *[dynamic inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html#inventory-script-example-aws-ec2)*. In the documentation linked you can also see ec2 dynamic inventory, which works quite well.
+
+
+And then run the the playbook.
+```
+ansible-playbook playbooks/telegraf-aws.yml -i *your inventory script*  --limit '*regexp to limit your search to only selected instances*'
+``
 
 ## Available options
 
