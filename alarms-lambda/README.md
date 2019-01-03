@@ -21,23 +21,24 @@ Deployment is handled via tool Terraform and make.  From [lambda-services](lambd
 ```
 make init env=ext-dev
 ```
-This will use variables from [ext-dev](lambda-services/ext-dev) directory and will initiate terraform state (state of your cloud infrastructure and will set it as empty). **There in `vars.tfvars` you should specify mandatory variables `AWS_REGION`, `VPC_ID`, `SUBNETS`, `KMS_KEY_ID`. All other are not needed.** Also you can change S3 bucket name, where terraform state (tfstate) will be stored, in [backends.tfvars](lambda-services/ext-dev/backends.tfvars) file.
+This will use variables from [ext-dev](lambda-services/ext-dev) directory and will initiate terraform state (state of your cloud infrastructure and will set it as empty). **In `vars.tfvars` you should specify mandatory variables `AWS_REGION`, `VPC_ID`, `SUBNETS`, `KMS_KEY_ID`. All other are not needed.** Also you can change S3 bucket name, where terraform state (tfstate) will be stored, in [backends.tfvars](lambda-services/ext-dev/backends.tfvars) file.
 
 After everything set up you can apply the infrastructure to AWS:
 ```
 make apply env=ext-dev
 ```
-
-**NOTE: having infrastructure in cloud will cost you money. After testing is over or you don't need lambda functions anymore, run: **
+NOTE: having infrastructure in cloud will cost you money. After testing is over or you don't need lambda functions anymore, run: 
 ```
 make destroy env=ext-dev
 ```
-**This will only remove lambda functions, but alarms will still stay in CloudWatch. For removing alarms, you need to go to Management console and remove them there. **
 
-## Configuration file
+**This will only remove lambda functions, but alarms will still stay in CloudWatch. For removing alarms, you need to go to Management console and remove them there.**
 
-Definition of alarms can be changed in configuration file. Syntax of config file is YAML and can be found in [modules/lambda-cloudwatch-alarms/alarms/config.yaml](modules/lambda-cloudwatch-alarms/alarms/config.yaml). Definition is straight forward and similar to definition in CloudFormation - [link](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html):
-```
+## Configuration
+### Configuring alarms
+
+Definition of alarms can be changed in configuration file. Format is YAML and can be found in [modules/lambda-cloudwatch-alarms/alarms/config.yaml](modules/lambda-cloudwatch-alarms/alarms/config.yaml). Definition is straight forward and similar to definition in CloudFormation - [link](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html):
+```yaml
 - alert_metric: disk_used_percent # Name of metric in CloudWatch
   namespace: "Monitoring/Telegraf" # Namespace in CW where metric is stored
   stat: Average # Statistic in CF
@@ -56,6 +57,15 @@ Definition of alarms can be changed in configuration file. Syntax of config file
       name: device
       value:
        - mapper/vg_elasticsearch_data-lv_elasticsearch_data
+```
+
+### Configuring Slack webhook
+
+Webhook url is defined in [ext-dev/vars.tfvars](lambda-services/ext-dev/vars.tfvars).
+
+Format is following:
+```
+SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/XXXX/XXXX/XXXX"
 ```
 
 
