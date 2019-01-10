@@ -1,14 +1,20 @@
-# Alarms Lambda
+# Uptime Lambda
 
-todo
+Lambda function that checks various URLs defined in configuration and checks if they are up. 
+
+Webpages are considered up, if return code is one of those:
+
+```
+200, 204, 301, 302, 401, 404
+```
 
 ## How to deploy
 
-Deployment is handled via tool Terraform and make.  From [lambda-services](lambda-services) directory, run 
+Deployment is handled via tool Terraform and make.  From [uptime-lambda](uptime-lambda) directory, run 
 ```
 make init env=ext-dev
 ```
-This will use variables from [ext-dev](lambda-services/ext-dev) directory and will initiate terraform state (state of your cloud infrastructure and will set it as empty). **In `vars.tfvars` you should specify mandatory variables `AWS_REGION`, `VPC_ID`, `SUBNETS`, `KMS_KEY_ID`. All other are not needed.** Also you can change S3 bucket name, where terraform state (tfstate) will be stored, in [backends.tfvars](lambda-services/ext-dev/backends.tfvars) file.
+This will use variables from [ext-dev](lambda-services/ext-dev) directory and will initiate terraform state (state of your cloud infrastructure and will set it as empty). **In `vars.tfvars` you should specify mandatory variables `AWS_REGION`, `VPC_ID`, `SUBNETS`, `KMS_KEY_ID`. All other are not needed.** Also you can change S3 bucket name, where terraform state (tfstate) will be stored, in [backends.tfvars](uptime-lambda/ext-dev/backends.tfvars) file.
 
 After everything set up you can apply the infrastructure to AWS:
 ```
@@ -24,7 +30,7 @@ make destroy env=ext-dev
 ## Configuration
 
 
-Which URLs will be monitored can be defined in [ext-dev/vars.tfvars](lambda-services/ext-dev/vars.tfvars).
+Which URLs will be monitored can be defined in [ext-dev/vars.tfvars](uptime-lambda/ext-dev/vars.tfvars).
 
 Format is following:
 ```
