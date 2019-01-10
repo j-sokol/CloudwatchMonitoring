@@ -18,7 +18,7 @@ KMS_KEY_ID = "arn:aws:kms:eu-central-1:353213619364:key/eab35943-7e9e-4b0c-8de1-
 #
 #################################
 
-OWNER = "yy530" # TODO - FILL IN / Used to Tag instances, not critical for operating the cluster
+OWNER = "jan.sokol" # TODO - FILL IN / Used to Tag instances, not critical for operating the cluster
 
 #################################
 #
